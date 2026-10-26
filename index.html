@@ -148,6 +148,8 @@ body.pg3 #p3{display:block}
 .nato{display:flex;align-items:center;gap:12px;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
 .nato:empty{display:none}
 #gag:empty{display:none}
+[data-theme="dark"]{color-scheme:dark}[data-theme="light"]{color-scheme:light}
+select option,select optgroup{background:var(--card);color:var(--fg)}
 #p6 #c11out .c6-rv .c6-mono,#p6 #c11out .c6-mono{white-space:normal;overflow-wrap:anywhere}#p6 #c11BsW[hidden]{display:none!important}
 body.pg3 #gag,body.pg4 #gag,body.pg5 #gag,body.pg6 #gag{display:none!important}
 .gx{margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px}
@@ -167,7 +169,7 @@ body.pg3 #gag,body.pg4 #gag,body.pg5 #gag,body.pg6 #gag{display:none!important}
 .gx .gn{min-width:0}
 .gx .ge{font-size:12.5px;color:var(--mut);padding:0 0 10px}
 body.pg3 #nato,body.pg4 #nato,body.pg5 #nato,body.pg6 #nato{display:none!important}
-.nato svg{flex:none;width:92px;height:30px}
+.nato svg{flex:none;width:120px;height:39px}
 .nato .nt{min-width:0;font-size:12.5px;line-height:1.35;color:var(--mut)}
 .nato .nt b{display:block;color:var(--fg);font-size:14px}
 .nato .nt i{font-style:normal;font-size:11px;opacity:.85}
@@ -735,7 +737,7 @@ function buildWP(){WP={};names.forEach(n=>{const k=n.indexOf(' - '),w=k>0?n.slic
 // ===== 12,7 mm : seules les munitions de référence sont gardées (ordre du tableau STANAG 2953) =====
 // [référence, code couleur, motif, rang d'affichage (ordre du tableau)] · les motifs sont testés dans cet ordre
 const R127=[['M33','ball127',/M33(?!\d)/,0],['M17','tr127',/M17(?!\d)/,1],['APIT-M20','apit127',/APIT|M20(?!\d)/,5],['APEI-169','apei',/APEI|169(?!\d)/,6],['APT-115','apt',/APT|115(?!\d)/,4],['API-M8','api127',/API(?!T)/,3],['AP-M8','ap127',/AP(?![IET])/,2]];
-const is127=w=>/12[.,]\s*7|\.50\b|\b50\s*(BMG|CAL)|\bM3M\b|\bM3P\b|\bM2(HB)?\b|\bHMP\b|\bRMP\b/i.test(w);
+const is127=w=>/12[.,]\s*7|\.50\b|\b50\s*(BMG|CAL)|\bM3[A-Z]?\b|\bM2(HB)?\b|\bHMP\b|\bRMP\b/i.test(w);
 const wOf=n=>{const k=n.indexOf(' - ');return k>0?n.slice(0,k).trim():n;};
 const tOf=n=>{const k=n.indexOf(' - ');return k>0?n.slice(k+3).trim():'';};
 function m127(t){const u=String(t).toUpperCase().replace(/[\s_\-.\/()]/g,'');if(!u)return -1;return R127.findIndex(r=>r[2].test(u));}
@@ -834,7 +836,7 @@ function natoSvg(o){
  if(o.mc){const b=NC[o.body];
   return `<svg viewBox="0 0 92 30" aria-hidden="true"><rect x="2" y="7" width="40" height="16" rx="2" fill="${case_}"/><rect x="40" y="6" width="4" height="18" fill="#b9b9b9"/><path d="M44 6 H70 Q90 9 90 15 Q90 21 70 24 H44 Z" fill="${b}" stroke="rgba(0,0,0,.25)"/>${o.band?`<rect x="60" y="6.5" width="4" height="17" fill="${NC[o.band]}"/>`:''}<rect x="48" y="12" width="9" height="1.6" fill="${o.body==='yellow'?'#111':'#fff'}"/><rect x="48" y="16" width="7" height="1.6" fill="${o.body==='yellow'?'#111':'#fff'}"/></svg>`;}
  const tip=F(o.tip),ring=o.ring?NC[o.ring]:null;
- return `<svg viewBox="0 0 92 30" aria-hidden="true"><rect x="2" y="8" width="48" height="14" rx="2" fill="${case_}"/><path d="M50 9 L56 10.5 V19.5 L50 21 Z" fill="${case_}"/><path d="M56 10.5 H70 Q86 12 90 15 Q86 18 70 19.5 H56 Z" fill="#b87333"/>${o.tip?`<path d="M78 11.6 Q86 12.8 90 15 Q86 17.2 78 18.4 Z" fill="${tip}" stroke="rgba(0,0,0,.25)" stroke-width=".5"/>`:''}${ring?`<path d="M74.5 11.2 L78 11.6 V18.4 L74.5 18.8 Z" fill="${ring}"/>`:''}</svg>`;}
+ return `<svg viewBox="0 0 92 30" aria-hidden="true"><rect x="2" y="8" width="48" height="14" rx="2" fill="${case_}"/><path d="M50 9 L56 10.5 V19.5 L50 21 Z" fill="${case_}"/><path d="M56 10.5 H70 Q86 12 90 15 Q86 18 70 19.5 H56 Z" fill="#b87333"/>${o.tip?`<path d="${ring?'M80 12.3':'M78 11.6'} Q86 12.8 90 15 Q86 17.2 ${ring?'80 17.7':'78 18.4'} Z" fill="${tip}" stroke="rgba(0,0,0,.25)" stroke-width=".5"/>`:''}${ring?`<path d="M70 10.6 Q75 11.3 80 12.3 V17.7 Q75 18.7 70 19.4 Z" fill="${ring}" stroke="rgba(0,0,0,.25)" stroke-width=".5"/>`:''}</svg>`;}
 function natoRender(){const el=$('nato');if(!el)return;if(!cur||!D[cur]){el.innerHTML='';return;}
  const tt2=(a,b)=>LANG==='en'?b:a,k=natoKind(cur);
  if(!k){el.innerHTML=`<div class="nt"><b>${tt2('Code couleur OTAN','NATO colour code')}</b>${tt2('Type de munition non reconnu dans le nom : ','Ammunition type not recognised from the name: ')}${cur.split(' - ').pop()}</div>`;return;}
