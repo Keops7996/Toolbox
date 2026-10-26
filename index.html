@@ -755,7 +755,9 @@ function gagFor(w){const wt=gT(w);if(!wt.length)return [];const all=['*','TOUS',
  const isAll=g=>all.includes(gN(g.arme));
  // 1) même arme exactement (mots identiques)
  let r=GAG.filter(g=>!isAll(g)&&key(gT(g.arme))===key(wt));
- // 2) sinon, l'arme de la feuille dont le nom est le début le plus long du nom de l'onglet (M2HB-QCB l'emporte sur M2HB)
+ // 2) sinon, toutes les variantes plus précises de l'arme (onglet « M2 » : lignes M2HB et M2HB-QCB)
+ if(!r.length){const wk=key(wt);r=GAG.filter(g=>{if(isAll(g))return false;const ak=key(gT(g.arme));return ak.length>wk.length&&ak.startsWith(wk);});}
+ // 3) sinon, l'arme de la feuille dont le nom est le début le plus long du nom de l'onglet (M2HB-QCB l'emporte sur M2HB)
  if(!r.length){let best=0;GAG.forEach(g=>{if(isAll(g))return;const at=gT(g.arme);if(at.length&&at.length<=wt.length&&at.every((t,i)=>t===wt[i]))best=Math.max(best,at.length);});
   if(best)r=GAG.filter(g=>{if(isAll(g))return false;const at=gT(g.arme);return at.length===best&&at.every((t,i)=>t===wt[i]);});}
  return r.concat(GAG.filter(isAll));}
@@ -766,7 +768,7 @@ function gagr(){const el=$('gag');if(!el)return;const T=(fr,en)=>LANG==='en'?en:
  const u=g=>g.unit?' '+e(g.unit):'';
  let body='';
  if(!rows.length)body=`<div class="ge">${T('Aucune cote pour « '+e(curW)+' » dans la feuille Calibres. La colonne Arme doit reprendre le nom de l\'arme (ex. '+e(curW)+').','No dimension for “'+e(curW)+'” in the Calibres sheet. The Arme column must use the weapon name (e.g. '+e(curW)+').')}</div>`;
- else{const grp=[];rows.forEach(g=>{let x=grp.find(y=>y[0]===g.reg);if(!x)grp.push(x=[g.reg,[]]);x[1].push(g);});
+ else{const grp=[];const multi=new Set(rows.filter(g=>!['*','TOUS','TOUTES','ALL'].includes(gN(g.arme))).map(g=>gT(g.arme).join('-'))).size>1;rows.forEach(g=>{const gk=(multi?String(g.arme).trim()+(g.reg?' · ':''):'')+(g.reg||'');let x=grp.find(y=>y[0]===gk);if(!x)grp.push(x=[gk,[]]);x[1].push(g);});
   grp.forEach(([rg,l])=>{if(rg||grp.length>1)body+=`<h4>${e(rg||T('Autres','Other'))}</h4>`;
    l.forEach(g=>{let v='';
     if(g.cote!==null)v=nf(g.cote)+u(g)+(g.tol!==null?`<small>${/^[±+\-]/.test(String(g.tol))?'':'± '}${nf(g.tol)}${u(g)}</small>`:'');
