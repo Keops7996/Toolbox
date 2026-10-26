@@ -747,7 +747,7 @@ function filter127(d){const out={},grp={};F127={tot:0,kept:0};
   if(!grp[w]){grp[w]=[];out['\u0000'+w]=null;}grp[w].push([R127[i][3],n]);});
  const res={};Object.keys(out).forEach(k=>{if(k[0]==='\u0000'){grp[k.slice(1)].sort((a,b)=>a[0]-b[0]).forEach(x=>res[x[1]]=d[x[1]]);}else res[k]=out[k];});
  return res;}
-let GAG=[];let GAGO=true;try{GAGO=localStorage.getItem('gago')!=='0';}catch(e){}
+let GAG=[];let GAGO=false; // carte des calibres fermée par défaut
 const gN=s=>String(s||'').toUpperCase().replace(/[\s,._\-\/]/g,'');
 // Nom d'arme réduit à ses mots (sans le calibre) : « M2HB-QCB 12,7 » -> [M2HB, QCB] ; « M2HB » et « M2HB-QCB » restent distincts
 const gT=s=>String(s||'').toUpperCase().split(/[\s_\/\-]+/).filter(t=>t&&!/^\d+([.,]\d+)?(MM)?$|^CAL(IBRE)?$|^MM$/.test(t));
@@ -776,7 +776,7 @@ function gagr(){const el=$('gag');if(!el)return;const T=(fr,en)=>LANG==='en'?en:
     const sub=[g.ref!==null?T('réf. ','ref. ')+e(g.ref):'',g.rem!==null?e(g.rem):''].filter(Boolean).join(' · ');
     body+=`<div class="gl"><span class="gn"><b>${g.cal!==null?e(g.cal):'—'}</b>${sub?`<small>${sub}</small>`:''}</span><span class="gv">${v||'—'}</span></div>`;});});}
  el.innerHTML=`<details class="gx"${GAGO?' open':''}><summary>📏 <b>${T('Calibres de réglage','Setting gauges')}</b><span>${T('feuillure · timing','headspace · timing')} · ${e(curW)}</span>${rows.length?`<em>${rows.length}</em>`:''}</summary><div class="gb">${body}</div></details>`;
- el.firstChild.addEventListener('toggle',ev=>{GAGO=ev.target.open;try{localStorage.setItem('gago',GAGO?'1':'0')}catch(_){}});}
+ el.firstChild.addEventListener('toggle',ev=>{GAGO=ev.target.open;});}
 function tabs(){const ws=Object.keys(WP);curW=(names.find(n=>n===cur)?cur:'').split(' - ')[0].trim()||ws[0];if(!WP[curW])curW=ws[0];
 $('tabs').innerHTML='';ws.forEach(n=>{const b=document.createElement('button');b.textContent=n;if(n===curW){b.className='on';setTimeout(()=>b.scrollIntoView({inline:'center',block:'nearest'}),0);}
 b.onclick=()=>{let t=null;try{t=localStorage.getItem('amt_'+n)}catch(e){}const o=WP[n].find(x=>x.key===t)||WP[n][0];cur=o.key;try{localStorage.setItem('amm',cur)}catch(e){};dflt();tabs();calc();};$('tabs').appendChild(b);});
