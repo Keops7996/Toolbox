@@ -749,9 +749,16 @@ function filter127(d){const out={},grp={};F127={tot:0,kept:0};
  return res;}
 let GAG=[];let GAGO=true;try{GAGO=localStorage.getItem('gago')!=='0';}catch(e){}
 const gN=s=>String(s||'').toUpperCase().replace(/[\s,._\-\/]/g,'');
-function gagFor(w){const n=gN(w);if(!n)return [];const all=['*','TOUS','TOUTES','ALL'];
- let r=GAG.filter(g=>gN(g.arme)===n);if(!r.length)r=GAG.filter(g=>{const a=gN(g.arme);return a&&(n.startsWith(a)||a.startsWith(n));});
- return r.concat(GAG.filter(g=>all.includes(gN(g.arme))));}
+// Nom d'arme réduit à ses mots (sans le calibre) : « M2HB-QCB 12,7 » -> [M2HB, QCB] ; « M2HB » et « M2HB-QCB » restent distincts
+const gT=s=>String(s||'').toUpperCase().split(/[\s_\/\-]+/).filter(t=>t&&!/^\d+([.,]\d+)?(MM)?$|^CAL(IBRE)?$|^MM$/.test(t));
+function gagFor(w){const wt=gT(w);if(!wt.length)return [];const all=['*','TOUS','TOUTES','ALL'],key=t=>t.join('-');
+ const isAll=g=>all.includes(gN(g.arme));
+ // 1) même arme exactement (mots identiques)
+ let r=GAG.filter(g=>!isAll(g)&&key(gT(g.arme))===key(wt));
+ // 2) sinon, l'arme de la feuille dont le nom est le début le plus long du nom de l'onglet (M2HB-QCB l'emporte sur M2HB)
+ if(!r.length){let best=0;GAG.forEach(g=>{if(isAll(g))return;const at=gT(g.arme);if(at.length&&at.length<=wt.length&&at.every((t,i)=>t===wt[i]))best=Math.max(best,at.length);});
+  if(best)r=GAG.filter(g=>{if(isAll(g))return false;const at=gT(g.arme);return at.length===best&&at.every((t,i)=>t===wt[i]);});}
+ return r.concat(GAG.filter(isAll));}
 function gagr(){const el=$('gag');if(!el)return;const T=(fr,en)=>LANG==='en'?en:fr;
  if(!GAG.length||!curW){el.innerHTML='';return;}
  const rows=gagFor(curW),e=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
